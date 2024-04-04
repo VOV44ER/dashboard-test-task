@@ -174,7 +174,7 @@ export default function Home() {
                   sortOrder={sortOrder}
                 />
               </table>
-              <div className="flex h-[529.5px] justify-center items-center min-h-[300px] bg-white">
+              <div className="flex h-[529.5px] text-black justify-center items-center min-h-[300px] bg-white">
                 We&apos;re sorry, but it seems that there are no products
                 matching your search criteria at the moment.
               </div>
