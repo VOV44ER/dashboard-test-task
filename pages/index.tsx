@@ -1,4 +1,7 @@
+import Pagination from "@/components/Pagination";
+import SearchInput from "@/components/SearchInput";
 import { SkeletonTable } from "@/components/SekeletonTable";
+import TableHeader from "@/components/TableHeader";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { useDebounce } from "use-debounce";
@@ -92,90 +95,18 @@ export default function Home() {
       <div className="bg-gray-200 rounded-lg p-12 flex gap-12 flex-col">
         <div className="flex justify-between">
           <h1 className="text-2xl">Products</h1>
-          <div style={{ position: "relative", display: "inline-block" }}>
-            <Image
-              style={{
-                position: "absolute",
-                top: "50%",
-                left: "5px",
-                transform: "translateY(-50%)",
-              }}
-              width={20}
-              height={20}
-              src={"/search.svg"}
-              alt="search-icon"
-            />
-            <input
-              type="text"
-              placeholder="Search by title"
-              value={searchQuery}
-              onChange={(e) => {
-                setCurrentPage(1);
-                setSearchQuery(e.target.value);
-              }}
-              className="px-3 py-1 border outline-none rounded-md pl-8"
-            />
-          </div>
+          <SearchInput value={searchQuery} onChange={setSearchQuery} />
         </div>
         <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
           {loading && <SkeletonTable />}
           {!loading && items?.length === 0 && (
             <>
               <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400 table-fixed">
-                <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-                  <tr>
-                    <th
-                      scope="col"
-                      className="px-6 py-3 cursor-pointer"
-                      onClick={() => handleSort("title")}
-                    >
-                      Product name
-                      {sortBy === "title" && (
-                        <span>{sortOrder === "asc" ? " ▲" : " ▼"}</span>
-                      )}
-                    </th>
-                    <th
-                      scope="col"
-                      className="px-6 py-3 cursor-pointer"
-                      onClick={() => handleSort("brand")}
-                    >
-                      Brand
-                      {sortBy === "brand" && (
-                        <span>{sortOrder === "asc" ? " ▲" : " ▼"}</span>
-                      )}
-                    </th>
-                    <th
-                      scope="col"
-                      className="px-6 py-3 cursor-pointer"
-                      onClick={() => handleSort("category")}
-                    >
-                      Category
-                      {sortBy === "category" && (
-                        <span>{sortOrder === "asc" ? " ▲" : " ▼"}</span>
-                      )}
-                    </th>
-                    <th
-                      scope="col"
-                      className="px-6 py-3 cursor-pointer"
-                      onClick={() => handleSort("price")}
-                    >
-                      Price
-                      {sortBy === "price" && (
-                        <span>{sortOrder === "asc" ? " ▲" : " ▼"}</span>
-                      )}
-                    </th>
-                    <th
-                      scope="col"
-                      className="px-6 py-3 cursor-pointer"
-                      onClick={() => handleSort("description")}
-                    >
-                      Description
-                      {sortBy === "description" && (
-                        <span>{sortOrder === "asc" ? " ▲" : " ▼"}</span>
-                      )}
-                    </th>
-                  </tr>
-                </thead>
+                <TableHeader
+                  handleSort={handleSort}
+                  sortBy={sortBy}
+                  sortOrder={sortOrder}
+                />
               </table>
               <div className="flex h-[529.5px] justify-center items-center min-h-[300px] bg-white">
                 We&apos;re sorry, but it seems that there are no products
@@ -266,38 +197,16 @@ export default function Home() {
           )}
         </div>
         {items?.length > 0 && (
-          <div className="mt-4 flex flex-col items-center gap-3">
-            <div>{`Showing ${rangeStart} - ${rangeEnd} of ${totalItems}`}</div>
-            <div>
-              <button
-                onClick={handlePreviousPage}
-                disabled={currentPage === 1}
-                className="px-3 py-1 mr-2 bg-green-500 text-white rounded disabled:bg-gray-300 disabled:text-gray-500"
-              >
-                Previous
-              </button>
-              {Array.from({ length: totalPages }, (_, index) => index + 1).map(
-                (pageNumber) => (
-                  <button
-                    key={pageNumber}
-                    onClick={() => setCurrentPage(pageNumber)}
-                    className={`px-3 py-1 mx-1 bg-green-500 text-white rounded ${
-                      currentPage === pageNumber ? "bg-green-700" : ""
-                    }`}
-                  >
-                    {pageNumber}
-                  </button>
-                )
-              )}
-              <button
-                onClick={handleNextPage}
-                disabled={currentPage === totalPages}
-                className="px-3 py-1 ml-2 bg-green-500 text-white rounded disabled:bg-gray-300 disabled:text-gray-500"
-              >
-                Next
-              </button>
-            </div>
-          </div>
+          <Pagination
+            totalPages={totalPages}
+            currentPage={currentPage}
+            handlePreviousPage={handlePreviousPage}
+            setCurrentPage={setCurrentPage}
+            handleNextPage={handleNextPage}
+            rangeStart={rangeStart}
+            rangeEnd={rangeEnd}
+            totalItems={totalItems}
+          />
         )}
       </div>
     </main>
