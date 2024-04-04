@@ -1,4 +1,6 @@
+import Image from "next/image";
 import { useEffect, useState } from "react";
+import { useDebounce } from "use-debounce";
 
 interface Product {
   id: number;
@@ -20,11 +22,13 @@ export default function Home() {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [sortBy, setSortBy] = useState<string>("title");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
+  const [searchQuery, setSearchQuery] = useState<string>("");
+  const [debouncedValue] = useDebounce(searchQuery, 500);
   const itemsPerPage = 10;
 
   useEffect(() => {
     fetch(
-      `https://dummyjson.com/products?limit=${itemsPerPage}&skip=${
+      `https://dummyjson.com/products/search?q=${debouncedValue}&limit=${itemsPerPage}&skip=${
         (currentPage - 1) * itemsPerPage
       }`
     )
@@ -40,7 +44,7 @@ export default function Home() {
           setTotalItems(res.total);
         }
       );
-  }, [currentPage]);
+  }, [currentPage, debouncedValue]);
 
   useEffect(() => {
     if (!items?.length) {
@@ -81,115 +85,143 @@ export default function Home() {
 
   return (
     <main className="flex w-full bg-white min-h-screen flex-col items-center justify-center">
-      <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
-        <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
-          <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-            <tr>
-              <th
-                scope="col"
-                className="px-6 py-3 cursor-pointer"
-                onClick={() => handleSort("title")}
-              >
-                Product name
-                {sortBy === "title" && (
-                  <span>{sortOrder === "asc" ? " ▲" : " ▼"}</span>
-                )}
-              </th>
-              <th
-                scope="col"
-                className="px-6 py-3 cursor-pointer"
-                onClick={() => handleSort("brand")}
-              >
-                Brand
-                {sortBy === "brand" && (
-                  <span>{sortOrder === "asc" ? " ▲" : " ▼"}</span>
-                )}
-              </th>
-              <th
-                scope="col"
-                className="px-6 py-3 cursor-pointer"
-                onClick={() => handleSort("category")}
-              >
-                Category
-                {sortBy === "category" && (
-                  <span>{sortOrder === "asc" ? " ▲" : " ▼"}</span>
-                )}
-              </th>
-              <th
-                scope="col"
-                className="px-6 py-3 cursor-pointer"
-                onClick={() => handleSort("price")}
-              >
-                Price
-                {sortBy === "price" && (
-                  <span>{sortOrder === "asc" ? " ▲" : " ▼"}</span>
-                )}
-              </th>
-              <th
-                scope="col"
-                className="px-6 py-3 cursor-pointer"
-                onClick={() => handleSort("description")}
-              >
-                Description
-                {sortBy === "description" && (
-                  <span>{sortOrder === "asc" ? " ▲" : " ▼"}</span>
-                )}
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {items.map(({ id, title, description, price, category, brand }) => (
-              <tr
-                key={id}
-                className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600"
-              >
+      <div className="bg-gray-200 rounded-lg p-12 flex gap-12 flex-col">
+        <div className="flex justify-between">
+          <h1 className="text-2xl">Products</h1>
+          <div style={{ position: "relative", display: "inline-block" }}>
+            <Image
+              style={{
+                position: "absolute",
+                top: "50%",
+                left: "5px",
+                transform: "translateY(-50%)",
+              }}
+              width={20}
+              height={20}
+              src={"/search.svg"}
+              alt="search-icon"
+            />
+            <input
+              type="text"
+              placeholder="Search by title"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="px-3 py-1 border outline-none rounded-md pl-8"
+            />
+          </div>
+        </div>
+        <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
+          <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+            <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+              <tr>
                 <th
-                  scope="row"
-                  className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+                  scope="col"
+                  className="px-6 py-3 cursor-pointer"
+                  onClick={() => handleSort("title")}
                 >
-                  {title}
+                  Product name
+                  {sortBy === "title" && (
+                    <span>{sortOrder === "asc" ? " ▲" : " ▼"}</span>
+                  )}
                 </th>
-                <td className="px-6 py-4">{brand}</td>
-                <td className="px-6 py-4">{category}</td>
-                <td className="px-6 py-4">${price}</td>
-                <td className="px-6 py-4 max-w-[350px] truncate">
-                  {description}
-                </td>
+                <th
+                  scope="col"
+                  className="px-6 py-3 cursor-pointer"
+                  onClick={() => handleSort("brand")}
+                >
+                  Brand
+                  {sortBy === "brand" && (
+                    <span>{sortOrder === "asc" ? " ▲" : " ▼"}</span>
+                  )}
+                </th>
+                <th
+                  scope="col"
+                  className="px-6 py-3 cursor-pointer"
+                  onClick={() => handleSort("category")}
+                >
+                  Category
+                  {sortBy === "category" && (
+                    <span>{sortOrder === "asc" ? " ▲" : " ▼"}</span>
+                  )}
+                </th>
+                <th
+                  scope="col"
+                  className="px-6 py-3 cursor-pointer"
+                  onClick={() => handleSort("price")}
+                >
+                  Price
+                  {sortBy === "price" && (
+                    <span>{sortOrder === "asc" ? " ▲" : " ▼"}</span>
+                  )}
+                </th>
+                <th
+                  scope="col"
+                  className="px-6 py-3 cursor-pointer"
+                  onClick={() => handleSort("description")}
+                >
+                  Description
+                  {sortBy === "description" && (
+                    <span>{sortOrder === "asc" ? " ▲" : " ▼"}</span>
+                  )}
+                </th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-      <div className="mt-4 flex flex-col items-center gap-3">
-        <div>{`Showing ${rangeStart} - ${rangeEnd} of ${totalItems}`}</div>
-        <div>
-          <button
-            onClick={handlePreviousPage}
-            disabled={currentPage === 1}
-            className="px-3 py-1 mr-2 bg-green-500 text-white rounded disabled:bg-gray-300 disabled:text-gray-500"
-          >
-            Previous
-          </button>
-          {Array.from({ length: totalPages }, (_, index) => index + 1).map(
-            (pageNumber) => (
-              <button
-                key={pageNumber}
-                onClick={() => setCurrentPage(pageNumber)}
-                className={`px-3 py-1 mx-1 bg-green-500 text-white rounded ${
-                  currentPage === pageNumber ? "bg-green-700" : ""
-                }`}
-              >
-                {pageNumber}
-              </button>
-            )
-          )}
-          <button
-            onClick={handleNextPage}
-            disabled={currentPage === totalPages}
-            className="px-3 py-1 ml-2 bg-green-500 text-white rounded disabled:bg-gray-300 disabled:text-gray-500"
-          >
-            Next
-          </button>
+            </thead>
+            <tbody>
+              {items.map(
+                ({ id, title, description, price, category, brand }) => (
+                  <tr
+                    key={id}
+                    className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600"
+                  >
+                    <th
+                      scope="row"
+                      className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+                    >
+                      {title}
+                    </th>
+                    <td className="px-6 py-4">{brand}</td>
+                    <td className="px-6 py-4">{category}</td>
+                    <td className="px-6 py-4">${price}</td>
+                    <td className="px-6 py-4 max-w-[350px] truncate">
+                      {description}
+                    </td>
+                  </tr>
+                )
+              )}
+            </tbody>
+          </table>
+        </div>
+        <div className="mt-4 flex flex-col items-center gap-3">
+          <div>{`Showing ${rangeStart} - ${rangeEnd} of ${totalItems}`}</div>
+          <div>
+            <button
+              onClick={handlePreviousPage}
+              disabled={currentPage === 1}
+              className="px-3 py-1 mr-2 bg-green-500 text-white rounded disabled:bg-gray-300 disabled:text-gray-500"
+            >
+              Previous
+            </button>
+            {Array.from({ length: totalPages }, (_, index) => index + 1).map(
+              (pageNumber) => (
+                <button
+                  key={pageNumber}
+                  onClick={() => setCurrentPage(pageNumber)}
+                  className={`px-3 py-1 mx-1 bg-green-500 text-white rounded ${
+                    currentPage === pageNumber ? "bg-green-700" : ""
+                  }`}
+                >
+                  {pageNumber}
+                </button>
+              )
+            )}
+            <button
+              onClick={handleNextPage}
+              disabled={currentPage === totalPages}
+              className="px-3 py-1 ml-2 bg-green-500 text-white rounded disabled:bg-gray-300 disabled:text-gray-500"
+            >
+              Next
+            </button>
+          </div>
         </div>
       </div>
     </main>
