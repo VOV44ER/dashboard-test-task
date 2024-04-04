@@ -24,8 +24,8 @@ export default function Home() {
   const rangeEnd = Math.min(currentPage * itemsPerPage, totalItems);
   const totalPages = Math.ceil(totalItems / itemsPerPage);
 
-  const handleFilter = () => {
-    fetch(`https://dummyjson.com/products/category/${selectedOption}`)
+  const handleFilter = (option: string) => {
+    fetch(`https://dummyjson.com/products/category/${option}`)
       .then((res) => res.json())
       .then(
         (res: {
@@ -34,9 +34,10 @@ export default function Home() {
           total: number;
           products: Product[];
         }) => {
-          console.log(res);
+          setSelectedOption(option);
           setItems(res.products);
           setTotalItems(res.total);
+          setShowFilterModal(false);
           setLoading(false);
         }
       );
@@ -64,6 +65,9 @@ export default function Home() {
   }, [debouncedValue]);
 
   useEffect(() => {
+    if (selectedOption) {
+      return;
+    }
     setLoading(true);
     fetch(
       `https://dummyjson.com/products/search?q=${debouncedValue}&limit=${itemsPerPage}&skip=${
@@ -83,7 +87,7 @@ export default function Home() {
           setLoading(false);
         }
       );
-  }, [currentPage]);
+  }, [currentPage, selectedOption]);
 
   useEffect(() => {
     if (!items?.length) {
@@ -147,12 +151,12 @@ export default function Home() {
                 viewBox="0 0 24 24"
               >
                 <path
-                  fill-rule="evenodd"
+                  fillRule="evenodd"
                   d="M22 2H2a1 1 0 0 0-.707 1.707L10 13.414V20a1 1 0 0 0 1.451.892l4-2a1 1 0 0 0 .549-.894V13.414l8.707-8.707A1 1 0 0 0 22 2zm-2 10.586L12.586 4H19v8.586z"
-                  clip-rule="evenodd"
+                  clipRule="evenodd"
                 />
               </svg>
-              Filter
+              {selectedOption ? selectedOption : "Filter"}
             </button>
             <SearchInput value={searchQuery} onChange={setSearchQuery} />
           </div>

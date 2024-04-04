@@ -4,7 +4,7 @@ interface FilterModalProps {
   onClose: () => void;
   selectedOption: string;
   setSelectedOption: (option: string) => void;
-  handleFilter: () => void;
+  handleFilter: (value: string) => void;
 }
 
 const FilterModal: React.FC<FilterModalProps> = ({
@@ -14,6 +14,7 @@ const FilterModal: React.FC<FilterModalProps> = ({
   handleFilter,
 }) => {
   const [categories, setCategories] = useState<string[]>([]);
+  const [value, setValue] = useState<string>("");
   const modalRef = useRef<HTMLDivElement>(null);
   const selectRef = useRef<HTMLSelectElement>(null);
   const [isOpen, setIsOpen] = useState(false);
@@ -77,7 +78,7 @@ const FilterModal: React.FC<FilterModalProps> = ({
             className="flex relative items-center appearance-none w-full text-black bg-white border border-gray-400 hover:border-gray-500 px-4 py-2 pr-8 rounded shadow leading-tight focus:outline-none focus:shadow-outline cursor-pointer"
             onClick={toggleDropdown}
           >
-            <span>{selectedOption || "Select an option"}</span>
+            <span>{value || selectedOption || "Select an option"}</span>
             <svg
               xmlns="http://www.w3.org/2000/svg"
               className={`h-4 w-4 ml-2 absolute top-[35%] right-[2%] ${
@@ -102,7 +103,7 @@ const FilterModal: React.FC<FilterModalProps> = ({
                 key={index}
                 className="cursor-pointer text-black hover:bg-gray-100 px-4 py-2"
                 onClick={() => {
-                  setSelectedOption(category);
+                  setValue(category);
                   toggleDropdown();
                 }}
               >
@@ -119,9 +120,22 @@ const FilterModal: React.FC<FilterModalProps> = ({
           >
             Close
           </button>
+          {selectedOption && (
+            <button
+              type="button"
+              disabled={!selectedOption}
+              onClick={() => {
+                setSelectedOption("");
+                onClose();
+              }}
+              className="text-gray-900 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 font-medium rounded-full text-sm px-5 py-2.5 me-2 mb-2"
+            >
+              Reset Filter
+            </button>
+          )}
           <button
             type="button"
-            onClick={handleFilter}
+            onClick={() => handleFilter(value)}
             className="text-white bg-green-700 hover:bg-green-800 focus:outline-none focus:ring-4 focus:ring-green-300 font-medium rounded-full text-sm px-5 py-2.5 text-center me-2 mb-2"
           >
             Filter
