@@ -14,7 +14,7 @@ const FilterModal: React.FC<FilterModalProps> = ({
   handleFilter,
 }) => {
   const [categories, setCategories] = useState<string[]>([]);
-  const [value, setValue] = useState<string>("");
+  const [value, setValue] = useState<string>(selectedOption);
   const modalRef = useRef<HTMLDivElement>(null);
   const selectRef = useRef<HTMLSelectElement>(null);
   const [isOpen, setIsOpen] = useState(false);

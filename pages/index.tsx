@@ -37,6 +37,7 @@ export default function Home() {
           setSelectedOption(option);
           setItems(res.products);
           setTotalItems(res.total);
+          setCurrentPage(1);
           setShowFilterModal(false);
           setLoading(false);
         }
@@ -46,6 +47,7 @@ export default function Home() {
   useEffect(() => {
     setLoading(true);
     setCurrentPage(1);
+    setSelectedOption("");
     fetch(
       `https://dummyjson.com/products/search?q=${debouncedValue}&limit=${itemsPerPage}&skip=${0}`
     )

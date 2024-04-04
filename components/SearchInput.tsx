@@ -8,7 +8,7 @@ interface Props {
 
 const SearchInput: React.FC<Props> = ({ value, onChange }) => {
   return (
-    <div className="relative inline-block">
+    <div className="relative text-black inline-block">
       <Image
         className="absolute top-1/2 transform -translate-y-1/2 ml-1.5"
         width={20}
