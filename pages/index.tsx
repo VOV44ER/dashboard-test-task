@@ -18,7 +18,10 @@ export default function Home() {
   const [items, setItems] = useState<Product[]>([]);
   const [totalItems, setTotalItems] = useState<number>(0);
   const [currentPage, setCurrentPage] = useState<number>(1);
+  const [sortBy, setSortBy] = useState<string>("title");
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
   const itemsPerPage = 10;
+
   useEffect(() => {
     fetch(
       `https://dummyjson.com/products?limit=${itemsPerPage}&skip=${
@@ -35,10 +38,24 @@ export default function Home() {
         }) => {
           setItems(res.products);
           setTotalItems(res.total);
-          console.log(res);
         }
       );
   }, [currentPage]);
+
+  useEffect(() => {
+    if (!items?.length) {
+      return;
+    }
+    const sortedItems = [...items].sort((a, b) => {
+      const aValue = (a as any)[sortBy];
+      const bValue = (b as any)[sortBy];
+
+      if (aValue < bValue) return sortOrder === "asc" ? -1 : 1;
+      if (aValue > bValue) return sortOrder === "asc" ? 1 : -1;
+      return 0;
+    });
+    setItems(sortedItems);
+  }, [sortBy, sortOrder]);
 
   const totalPages = Math.ceil(totalItems / itemsPerPage);
 
@@ -50,7 +67,15 @@ export default function Home() {
     setCurrentPage((prevPage) => Math.min(prevPage + 1, totalPages));
   };
 
-  // Calculate the range of items being shown
+  const handleSort = (column: string) => {
+    if (sortBy === column) {
+      setSortOrder((prevOrder) => (prevOrder === "asc" ? "desc" : "asc"));
+    } else {
+      setSortBy(column);
+      setSortOrder("asc");
+    }
+  };
+
   const rangeStart = (currentPage - 1) * itemsPerPage + 1;
   const rangeEnd = Math.min(currentPage * itemsPerPage, totalItems);
 
@@ -60,20 +85,55 @@ export default function Home() {
         <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
           <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
             <tr>
-              <th scope="col" className="px-6 py-3">
+              <th
+                scope="col"
+                className="px-6 py-3 cursor-pointer"
+                onClick={() => handleSort("title")}
+              >
                 Product name
+                {sortBy === "title" && (
+                  <span>{sortOrder === "asc" ? " ▲" : " ▼"}</span>
+                )}
               </th>
-              <th scope="col" className="px-6 py-3">
+              <th
+                scope="col"
+                className="px-6 py-3 cursor-pointer"
+                onClick={() => handleSort("brand")}
+              >
                 Brand
+                {sortBy === "brand" && (
+                  <span>{sortOrder === "asc" ? " ▲" : " ▼"}</span>
+                )}
               </th>
-              <th scope="col" className="px-6 py-3">
+              <th
+                scope="col"
+                className="px-6 py-3 cursor-pointer"
+                onClick={() => handleSort("category")}
+              >
                 Category
+                {sortBy === "category" && (
+                  <span>{sortOrder === "asc" ? " ▲" : " ▼"}</span>
+                )}
               </th>
-              <th scope="col" className="px-6 py-3">
+              <th
+                scope="col"
+                className="px-6 py-3 cursor-pointer"
+                onClick={() => handleSort("price")}
+              >
                 Price
+                {sortBy === "price" && (
+                  <span>{sortOrder === "asc" ? " ▲" : " ▼"}</span>
+                )}
               </th>
-              <th scope="col" className="px-6 py-3">
+              <th
+                scope="col"
+                className="px-6 py-3 cursor-pointer"
+                onClick={() => handleSort("description")}
+              >
                 Description
+                {sortBy === "description" && (
+                  <span>{sortOrder === "asc" ? " ▲" : " ▼"}</span>
+                )}
               </th>
             </tr>
           </thead>
