@@ -1,23 +1,11 @@
+import FilterModal from "@/components/FilterModal";
 import Pagination from "@/components/Pagination";
 import SearchInput from "@/components/SearchInput";
 import { SkeletonTable } from "@/components/SekeletonTable";
 import TableHeader from "@/components/TableHeader";
+import { Product } from "@/types/interfaces";
 import { useEffect, useState } from "react";
 import { useDebounce } from "use-debounce";
-
-interface Product {
-  id: number;
-  title: string;
-  description: string;
-  price: number;
-  discountPercentage: number;
-  rating: number;
-  stock: number;
-  brand: string;
-  category: string;
-  thumbnail: string;
-  images: string[];
-}
 
 export default function Home() {
   const [items, setItems] = useState<Product[]>([]);
@@ -27,8 +15,13 @@ export default function Home() {
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [debouncedValue] = useDebounce(searchQuery, 500);
+  const [showFilterModal, setShowFilterModal] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
+
   const itemsPerPage = 10;
+  const rangeStart = (currentPage - 1) * itemsPerPage + 1;
+  const rangeEnd = Math.min(currentPage * itemsPerPage, totalItems);
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
 
   useEffect(() => {
     setLoading(true);
@@ -88,8 +81,6 @@ export default function Home() {
     setItems(sortedItems);
   }, [sortBy, sortOrder]);
 
-  const totalPages = Math.ceil(totalItems / itemsPerPage);
-
   const handlePreviousPage = () => {
     setCurrentPage((prevPage) => Math.max(prevPage - 1, 1));
   };
@@ -107,8 +98,9 @@ export default function Home() {
     }
   };
 
-  const rangeStart = (currentPage - 1) * itemsPerPage + 1;
-  const rangeEnd = Math.min(currentPage * itemsPerPage, totalItems);
+  const toggleFilterModal = () => {
+    setShowFilterModal((prev) => !prev);
+  };
 
   return (
     <main className="flex w-full p-12 bg-white min-h-screen flex-col items-center justify-center">
@@ -122,7 +114,29 @@ export default function Home() {
           >
             Products
           </h1>
-          <SearchInput value={searchQuery} onChange={setSearchQuery} />
+          <div className="flex items-center gap-12">
+            <button
+              type="button"
+              onClick={toggleFilterModal}
+              className="text-white bg-green-700 hover:bg-green-800 font-medium rounded-lg text-sm px-5 py-2 text-center inline-flex items-center me-2"
+            >
+              <svg
+                className="w-3.5 h-3.5 me-2"
+                aria-hidden="true"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  fill-rule="evenodd"
+                  d="M22 2H2a1 1 0 0 0-.707 1.707L10 13.414V20a1 1 0 0 0 1.451.892l4-2a1 1 0 0 0 .549-.894V13.414l8.707-8.707A1 1 0 0 0 22 2zm-2 10.586L12.586 4H19v8.586z"
+                  clip-rule="evenodd"
+                />
+              </svg>
+              Filter
+            </button>
+            <SearchInput value={searchQuery} onChange={setSearchQuery} />
+          </div>
         </div>
         <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
           {loading && <SkeletonTable />}
@@ -187,6 +201,7 @@ export default function Home() {
           />
         )}
       </div>
+      {showFilterModal && <FilterModal onClose={toggleFilterModal} />}
     </main>
   );
 }
