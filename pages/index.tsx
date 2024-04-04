@@ -1,3 +1,4 @@
+import { SkeletonTable } from "@/components/SekeletonTable";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { useDebounce } from "use-debounce";
@@ -24,9 +25,11 @@ export default function Home() {
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [debouncedValue] = useDebounce(searchQuery, 500);
+  const [loading, setLoading] = useState<boolean>(false);
   const itemsPerPage = 10;
 
   useEffect(() => {
+    setLoading(true);
     fetch(
       `https://dummyjson.com/products/search?q=${debouncedValue}&limit=${itemsPerPage}&skip=${
         (currentPage - 1) * itemsPerPage
@@ -42,6 +45,7 @@ export default function Home() {
         }) => {
           setItems(res.products);
           setTotalItems(res.total);
+          setLoading(false);
         }
       );
   }, [currentPage, debouncedValue]);
@@ -111,85 +115,89 @@ export default function Home() {
           </div>
         </div>
         <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
-          <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
-            <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-              <tr>
-                <th
-                  scope="col"
-                  className="px-6 py-3 cursor-pointer"
-                  onClick={() => handleSort("title")}
-                >
-                  Product name
-                  {sortBy === "title" && (
-                    <span>{sortOrder === "asc" ? " ▲" : " ▼"}</span>
-                  )}
-                </th>
-                <th
-                  scope="col"
-                  className="px-6 py-3 cursor-pointer"
-                  onClick={() => handleSort("brand")}
-                >
-                  Brand
-                  {sortBy === "brand" && (
-                    <span>{sortOrder === "asc" ? " ▲" : " ▼"}</span>
-                  )}
-                </th>
-                <th
-                  scope="col"
-                  className="px-6 py-3 cursor-pointer"
-                  onClick={() => handleSort("category")}
-                >
-                  Category
-                  {sortBy === "category" && (
-                    <span>{sortOrder === "asc" ? " ▲" : " ▼"}</span>
-                  )}
-                </th>
-                <th
-                  scope="col"
-                  className="px-6 py-3 cursor-pointer"
-                  onClick={() => handleSort("price")}
-                >
-                  Price
-                  {sortBy === "price" && (
-                    <span>{sortOrder === "asc" ? " ▲" : " ▼"}</span>
-                  )}
-                </th>
-                <th
-                  scope="col"
-                  className="px-6 py-3 cursor-pointer"
-                  onClick={() => handleSort("description")}
-                >
-                  Description
-                  {sortBy === "description" && (
-                    <span>{sortOrder === "asc" ? " ▲" : " ▼"}</span>
-                  )}
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {items.map(
-                ({ id, title, description, price, category, brand }) => (
-                  <tr
-                    key={id}
-                    className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600"
+          {loading || items?.length === 0 ? (
+            <SkeletonTable />
+          ) : (
+            <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400 table-fixed">
+              <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                <tr>
+                  <th
+                    scope="col"
+                    className="px-6 py-3 cursor-pointer"
+                    onClick={() => handleSort("title")}
                   >
-                    <th
-                      scope="row"
-                      className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+                    Product name
+                    {sortBy === "title" && (
+                      <span>{sortOrder === "asc" ? " ▲" : " ▼"}</span>
+                    )}
+                  </th>
+                  <th
+                    scope="col"
+                    className="px-6 py-3 cursor-pointer"
+                    onClick={() => handleSort("brand")}
+                  >
+                    Brand
+                    {sortBy === "brand" && (
+                      <span>{sortOrder === "asc" ? " ▲" : " ▼"}</span>
+                    )}
+                  </th>
+                  <th
+                    scope="col"
+                    className="px-6 py-3 cursor-pointer"
+                    onClick={() => handleSort("category")}
+                  >
+                    Category
+                    {sortBy === "category" && (
+                      <span>{sortOrder === "asc" ? " ▲" : " ▼"}</span>
+                    )}
+                  </th>
+                  <th
+                    scope="col"
+                    className="px-6 py-3 cursor-pointer"
+                    onClick={() => handleSort("price")}
+                  >
+                    Price
+                    {sortBy === "price" && (
+                      <span>{sortOrder === "asc" ? " ▲" : " ▼"}</span>
+                    )}
+                  </th>
+                  <th
+                    scope="col"
+                    className="px-6 py-3 cursor-pointer"
+                    onClick={() => handleSort("description")}
+                  >
+                    Description
+                    {sortBy === "description" && (
+                      <span>{sortOrder === "asc" ? " ▲" : " ▼"}</span>
+                    )}
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {items.map(
+                  ({ id, title, description, price, category, brand }) => (
+                    <tr
+                      key={id}
+                      className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600"
                     >
-                      {title}
-                    </th>
-                    <td className="px-6 py-4">{brand}</td>
-                    <td className="px-6 py-4">{category}</td>
-                    <td className="px-6 py-4">${price}</td>
-                    <td className="px-6 py-4 max-w-[350px] truncate">
-                      {description}
-                    </td>
-                  </tr>
-                )
-              )}
-            </tbody>
-          </table>
+                      <th
+                        scope="row"
+                        className="px-6 py-4 truncate font-medium text-gray-900 whitespace-nowrap dark:text-white"
+                      >
+                        {title}
+                      </th>
+                      <td className="px-6 truncate py-4">{brand}</td>
+                      <td className="px-6 py-4">{category}</td>
+                      <td className="px-6 py-4">${price}</td>
+                      <td className="px-6 py-4 max-w-[350px] truncate">
+                        {description}
+                      </td>
+                    </tr>
+                  )
+                )}
+              </tbody>
+            </table>
+          )}
         </div>
         <div className="mt-4 flex flex-col items-center gap-3">
           <div>{`Showing ${rangeStart} - ${rangeEnd} of ${totalItems}`}</div>
