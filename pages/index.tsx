@@ -9,6 +9,7 @@ import { useDebounce } from "use-debounce";
 
 export default function Home() {
   const [items, setItems] = useState<Product[]>([]);
+  const [selectedOption, setSelectedOption] = useState<string>("");
   const [totalItems, setTotalItems] = useState<number>(0);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [sortBy, setSortBy] = useState<string>("title");
@@ -22,6 +23,24 @@ export default function Home() {
   const rangeStart = (currentPage - 1) * itemsPerPage + 1;
   const rangeEnd = Math.min(currentPage * itemsPerPage, totalItems);
   const totalPages = Math.ceil(totalItems / itemsPerPage);
+
+  const handleFilter = () => {
+    fetch(`https://dummyjson.com/products/category/${selectedOption}`)
+      .then((res) => res.json())
+      .then(
+        (res: {
+          limit: number;
+          skip: number;
+          total: number;
+          products: Product[];
+        }) => {
+          console.log(res);
+          setItems(res.products);
+          setTotalItems(res.total);
+          setLoading(false);
+        }
+      );
+  };
 
   useEffect(() => {
     setLoading(true);
@@ -198,7 +217,14 @@ export default function Home() {
           />
         )}
       </div>
-      {showFilterModal && <FilterModal onClose={toggleFilterModal} />}
+      {showFilterModal && (
+        <FilterModal
+          selectedOption={selectedOption}
+          setSelectedOption={setSelectedOption}
+          onClose={toggleFilterModal}
+          handleFilter={handleFilter}
+        />
+      )}
     </main>
   );
 }
