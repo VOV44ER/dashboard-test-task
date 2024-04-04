@@ -16,7 +16,7 @@ interface Props {
 
 const TableHeader: React.FC<Props> = ({ handleSort, sortBy, sortOrder }) => {
   return (
-    <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+    <thead className="text-xs text-gray-700 uppercase bg-gray-50">
       <tr>
         {columns.map((column) => (
           <th

@@ -110,7 +110,7 @@ export default function Home() {
             onClick={() => {
               setSearchQuery("");
             }}
-            className="text-2xl cursor-pointer"
+            className="text-2xl text-black cursor-pointer"
           >
             Products
           </h1>
@@ -142,7 +142,7 @@ export default function Home() {
           {loading && <SkeletonTable />}
           {!loading && items?.length === 0 && (
             <>
-              <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400 table-fixed">
+              <table className="w-full text-sm text-left rtl:text-right text-gray-500 table-fixed">
                 <TableHeader
                   handleSort={handleSort}
                   sortBy={sortBy}
@@ -156,7 +156,7 @@ export default function Home() {
             </>
           )}
           {!loading && items?.length > 0 && (
-            <table className="w-full h-[570px] text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400 table-fixed">
+            <table className="w-full h-[570px] text-sm text-left rtl:text-right text-gray-500 table-fixed">
               <TableHeader
                 handleSort={handleSort}
                 sortBy={sortBy}
@@ -165,13 +165,10 @@ export default function Home() {
               <tbody>
                 {items.map(
                   ({ id, title, description, price, category, brand }) => (
-                    <tr
-                      key={id}
-                      className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600"
-                    >
+                    <tr key={id} className="bg-white border-b hover:bg-gray-50">
                       <th
                         scope="row"
-                        className="px-6 py-4 truncate font-medium text-gray-900 whitespace-nowrap dark:text-white"
+                        className="px-6 py-4 truncate font-medium text-gray-900 whitespace-nowrap"
                       >
                         {title}
                       </th>

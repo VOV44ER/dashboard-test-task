@@ -23,7 +23,7 @@ const Pagination: React.FC<Props> = ({
 }) => {
   return (
     <div className="mt-4 flex flex-col items-center gap-3">
-      <div>{`Showing ${rangeStart} - ${rangeEnd} of ${totalItems}`}</div>
+      <div className="text-black">{`Showing ${rangeStart} - ${rangeEnd} of ${totalItems}`}</div>
       <div>
         <button
           onClick={handlePreviousPage}
