@@ -22,7 +22,7 @@ const TableHeader: React.FC<Props> = ({ handleSort, sortBy, sortOrder }) => {
           <th
             key={column.key}
             scope="col"
-            className="px-6 py-3 cursor-pointer"
+            className="px-6 py-3 cursor-pointer truncate"
             onClick={() => handleSort(column.key)}
           >
             {column.title}

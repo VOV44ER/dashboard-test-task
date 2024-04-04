@@ -2,7 +2,6 @@ import Pagination from "@/components/Pagination";
 import SearchInput from "@/components/SearchInput";
 import { SkeletonTable } from "@/components/SekeletonTable";
 import TableHeader from "@/components/TableHeader";
-import Image from "next/image";
 import { useEffect, useState } from "react";
 import { useDebounce } from "use-debounce";
 
@@ -33,6 +32,27 @@ export default function Home() {
 
   useEffect(() => {
     setLoading(true);
+    setCurrentPage(1);
+    fetch(
+      `https://dummyjson.com/products/search?q=${debouncedValue}&limit=${itemsPerPage}&skip=${0}`
+    )
+      .then((res) => res.json())
+      .then(
+        (res: {
+          limit: number;
+          skip: number;
+          total: number;
+          products: Product[];
+        }) => {
+          setItems(res.products);
+          setTotalItems(res.total);
+          setLoading(false);
+        }
+      );
+  }, [debouncedValue]);
+
+  useEffect(() => {
+    setLoading(true);
     fetch(
       `https://dummyjson.com/products/search?q=${debouncedValue}&limit=${itemsPerPage}&skip=${
         (currentPage - 1) * itemsPerPage
@@ -51,7 +71,7 @@ export default function Home() {
           setLoading(false);
         }
       );
-  }, [currentPage, debouncedValue]);
+  }, [currentPage]);
 
   useEffect(() => {
     if (!items?.length) {
@@ -94,7 +114,14 @@ export default function Home() {
     <main className="flex w-full p-12 bg-white min-h-screen flex-col items-center justify-center">
       <div className="bg-gray-200 rounded-lg p-12 flex gap-12 flex-col">
         <div className="flex justify-between">
-          <h1 className="text-2xl">Products</h1>
+          <h1
+            onClick={() => {
+              setSearchQuery("");
+            }}
+            className="text-2xl cursor-pointer"
+          >
+            Products
+          </h1>
           <SearchInput value={searchQuery} onChange={setSearchQuery} />
         </div>
         <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
@@ -116,60 +143,11 @@ export default function Home() {
           )}
           {!loading && items?.length > 0 && (
             <table className="w-full h-[570px] text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400 table-fixed">
-              <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-                <tr>
-                  <th
-                    scope="col"
-                    className="px-6 py-3 truncate cursor-pointer"
-                    onClick={() => handleSort("title")}
-                  >
-                    Product name
-                    {sortBy === "title" && (
-                      <span>{sortOrder === "asc" ? " ▲" : " ▼"}</span>
-                    )}
-                  </th>
-                  <th
-                    scope="col"
-                    className="px-6 py-3 cursor-pointer"
-                    onClick={() => handleSort("brand")}
-                  >
-                    Brand
-                    {sortBy === "brand" && (
-                      <span>{sortOrder === "asc" ? " ▲" : " ▼"}</span>
-                    )}
-                  </th>
-                  <th
-                    scope="col"
-                    className="px-6 py-3 cursor-pointer"
-                    onClick={() => handleSort("category")}
-                  >
-                    Category
-                    {sortBy === "category" && (
-                      <span>{sortOrder === "asc" ? " ▲" : " ▼"}</span>
-                    )}
-                  </th>
-                  <th
-                    scope="col"
-                    className="px-6 py-3 cursor-pointer"
-                    onClick={() => handleSort("price")}
-                  >
-                    Price
-                    {sortBy === "price" && (
-                      <span>{sortOrder === "asc" ? " ▲" : " ▼"}</span>
-                    )}
-                  </th>
-                  <th
-                    scope="col"
-                    className="px-6 py-3 cursor-pointer"
-                    onClick={() => handleSort("description")}
-                  >
-                    Description
-                    {sortBy === "description" && (
-                      <span>{sortOrder === "asc" ? " ▲" : " ▼"}</span>
-                    )}
-                  </th>
-                </tr>
-              </thead>
+              <TableHeader
+                handleSort={handleSort}
+                sortBy={sortBy}
+                sortOrder={sortOrder}
+              />
               <tbody>
                 {items.map(
                   ({ id, title, description, price, category, brand }) => (
